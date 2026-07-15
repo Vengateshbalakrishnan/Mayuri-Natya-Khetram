@@ -1,0 +1,1151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Portal - Mayuri Natya Khetram</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="style.css">
+    
+    <!-- Supabase JS Client Library CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <style>
+        /* Standalone Admin Page Layout Adjustments */
+        body {
+            background-color: #fafbfd;
+            margin: 0;
+            padding: 0;
+            font-family: 'Outfit', sans-serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        /* Dedicated Full-Screen Lockscreen */
+        .lockscreen-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, var(--primary-dark) 0%, #2d1f1c 100%);
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .lockscreen-card {
+            background: white;
+            border-radius: 16px;
+            border: 2px solid var(--accent);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+            max-width: 420px;
+            width: 100%;
+            overflow: hidden;
+            text-align: center;
+            animation: slideUp 0.5s ease-out;
+        }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Dashboard layout when unlocked */
+        .dashboard-wrapper {
+            display: none; /* Managed by JS */
+            grid-template-columns: 260px 1fr;
+            min-height: 100vh;
+            height: 100vh;
+            overflow: hidden;
+        }
+        .dashboard-wrapper.unlocked {
+            display: grid;
+        }
+        .admin-sidebar {
+            background-color: var(--primary-dark);
+            color: var(--text-light);
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            padding: 30px 0;
+            box-sizing: border-box;
+        }
+        .admin-content {
+            padding: 40px;
+            overflow-y: auto;
+            height: 100%;
+            box-sizing: border-box;
+            background-color: #fafbfd;
+        }
+        
+        /* Responsive layout for smaller viewports */
+        @media (max-width: 992px) {
+            .dashboard-wrapper.unlocked {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto 1fr;
+            }
+            .admin-sidebar {
+                height: auto;
+                padding: 15px 0;
+            }
+            .admin-logo-area {
+                padding: 0 15px 15px;
+                border-bottom: 1px solid rgba(255,255,255,0.1);
+                margin-bottom: 10px;
+                text-align: center;
+            }
+            .admin-menu {
+                flex-direction: row;
+                overflow-x: auto;
+                padding: 0 15px;
+            }
+            .admin-menu-item button, .admin-menu-item a {
+                padding: 12px 15px;
+                white-space: nowrap;
+            }
+            .admin-menu-item.active-tab button {
+                border-left: none;
+                border-bottom: 4px solid var(--accent);
+            }
+            .admin-content {
+                height: calc(100vh - 120px);
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Toast Notifications Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- 1. LOCKSCREEN ACCESS CONTROL -->
+    <div class="lockscreen-wrapper" id="adminLockscreen">
+        <div class="lockscreen-card">
+            <div style="background-color: var(--primary); padding: 35px 20px; text-align: center; position: relative;">
+                <img id="loginLogo" src="assets/logo_peacock.png" alt="Logo" style="height: 75px; width: 75px; border-radius: 50%; border: 3px solid var(--accent); background: white; object-fit: cover; margin-bottom: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
+                <h2 style="color: var(--text-light); font-size: 1.5rem; margin: 0; font-family: 'Cinzel', serif; letter-spacing: 0.5px;">Admin Console</h2>
+                <p style="color: var(--accent); font-size: 0.8rem; margin: 6px 0 0; font-style: italic; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">Secure Access Authorization</p>
+            </div>
+            <div style="padding: 35px 30px;">
+                <div class="form-group" style="margin-bottom: 25px; text-align: left;">
+                    <label for="adminPassword" style="display: block; font-weight: 600; margin-bottom: 8px; color: var(--primary-dark); font-size: 0.9rem;">Enter Security Password *</label>
+                    <input type="password" id="adminPassword" required placeholder="Enter password (default: admin123)" style="width: 100%; padding: 12px; border-radius: 6px; border: 1px solid var(--border-light); background-color: var(--bg-cream); font-size: 1rem; box-sizing: border-box;" onkeydown="if(event.key === 'Enter') handleAdminLogin()">
+                </div>
+                <button type="button" class="btn btn-primary" onclick="handleAdminLogin()" style="width: 100%; padding: 12px; font-size: 1rem; font-weight: 600; border-radius: 6px; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 10px rgba(74, 8, 20, 0.2);">Authorize & Enter</button>
+                <div style="margin-top: 20px;">
+                    <a href="index.html" style="color: var(--primary); text-decoration: none; font-size: 0.85rem; font-weight: 600;">← Back to Public Website</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. DASHBOARD MAIN INTERFACE -->
+    <div class="dashboard-wrapper" id="adminDashboard">
+        <!-- Sidebar -->
+        <div class="admin-sidebar">
+            <div class="admin-logo-area">
+                <h3 id="sidebarAcademyName">Mayuri Academy</h3>
+                <span>ADMIN CONTROL</span>
+            </div>
+            <ul class="admin-menu">
+                <li class="admin-menu-item active-tab" id="tab-overview" onclick="switchAdminTab('overview')">
+                    <button>
+                        <svg viewBox="0 0 24 24"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg>
+                        Overview
+                    </button>
+                </li>
+                <li class="admin-menu-item" id="tab-enquiries" onclick="switchAdminTab('enquiries')">
+                    <button>
+                        <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+                        Enquiries
+                    </button>
+                </li>
+                <li class="admin-menu-item" id="tab-students" onclick="switchAdminTab('students')">
+                    <button>
+                        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/></svg>
+                        Students Roster
+                    </button>
+                </li>
+                <li class="admin-menu-item" id="tab-fees" onclick="switchAdminTab('fees')">
+                    <button>
+                        <svg viewBox="0 0 24 24"><path d="M21 18v1c0 1.1-.9 2-2 2H5c-1.11 0-2-.9-2-2V5c0-1.1.89-2 2-2h14c1.1 0 2 .9 2 2v1h-9c-1.11 0-2 .9-2 2v8c0 1.1.89 2 2 2h9zm-9-2h10V8H12v8zm4-2.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>
+                        Fees
+                    </button>
+                </li>
+                <li class="admin-menu-item" id="tab-attendance" onclick="switchAdminTab('attendance')">
+                    <button>
+                        <svg viewBox="0 0 24 24"><path d="M19 3h-4.18C14.4 1.84 13.3 1 12 1c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm2 14H7v-2h7v-2zm3-4H7v-2h10v-2zm0-4H7V7h10v-2z"/></svg>
+                        Attendance
+                    </button>
+                </li>
+                <li class="admin-menu-item" id="tab-website-manager" onclick="switchAdminTab('website-manager')">
+                    <button>
+                        <svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+                        Website Manager
+                    </button>
+                </li>
+                <li class="admin-menu-item" id="tab-add-course" onclick="switchAdminTab('add-course')">
+                    <button>
+                        <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+                        Course Manager
+                    </button>
+                </li>
+                <li class="admin-menu-item" style="margin-top: auto; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">
+                    <a href="index.html" style="display: flex; align-items: center; gap: 12px; padding: 15px 25px; color: rgba(255,255,255,0.7); text-decoration: none; font-weight: 600; font-size: 0.9rem; transition: var(--transition);">
+                        <svg viewBox="0 0 24 24" style="width: 18px; height: 18px; fill: currentColor;"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+                        Back to Website
+                    </a>
+                </li>
+                <li class="admin-menu-item">
+                    <button onclick="handleAdminLogout()" style="color: #ffc107;">
+                        <svg viewBox="0 0 24 24"><path d="M13 3h-2v10h2V3zm4.78 1.42l-1.42 1.42A7.962 7.962 0 0 1 20 12c0 4.42-3.58 8-8 8s-8-3.58-8-8c0-2.43 1.08-4.61 2.8-6.15L5.38 4.42A9.914 9.914 0 0 0 2 12c0 5.52 4.48 10 10 10s10-4.48 10-10c0-3.05-1.37-5.78-3.53-7.58z"/></svg>
+                        Log Out
+                    </button>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Content Area -->
+        <div class="admin-content">
+            
+            <!-- Panel A: Overview -->
+            <div class="admin-tab-panel active-panel" id="panel-overview">
+                <div class="admin-header-title">
+                    <h3>Dashboard Overview</h3>
+                </div>
+                
+                <div class="admin-stats-grid">
+                    <div class="admin-stat-card">
+                        <h4>Active Students</h4>
+                        <div class="admin-stat-num" id="statStudents">0</div>
+                    </div>
+                    <div class="admin-stat-card stat-accent">
+                        <h4>Pending Enquiries</h4>
+                        <div class="admin-stat-num" id="statEnquiries">0</div>
+                    </div>
+                    <div class="admin-stat-card">
+                        <h4>Fees Collected</h4>
+                        <div class="admin-stat-num" id="statCollected">₹0</div>
+                    </div>
+                    <div class="admin-stat-card stat-accent">
+                        <h4>Pending Invoices</h4>
+                        <div class="admin-stat-num" id="statPending">0</div>
+                    </div>
+                </div>
+
+
+            </div>
+
+            <!-- Panel B: Enquiries List -->
+            <div class="admin-tab-panel" id="panel-enquiries">
+                <div class="admin-header-title">
+                    <h3>Visitor Enquiries</h3>
+                    <button class="btn btn-primary btn-sm" onclick="showAddEnquiryModal()">+ Add Manual Enquiry</button>
+                </div>
+                
+                <div class="table-responsive">
+                    <table class="db-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Student Name</th>
+                                <th>Course Interested</th>
+                                <th>Parent Phone</th>
+                                <th>Enquiry Source</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="enquiriesTableBody">
+                            <!-- Populated dynamically via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Panel C: Students Roster -->
+            <div class="admin-tab-panel" id="panel-students">
+                <div class="admin-header-title">
+                    <h3>Active Student Registry</h3>
+                    <button class="btn btn-primary btn-sm" onclick="showAddStudentModal()">+ Add New Student</button>
+                </div>
+
+                <div class="admin-form-panel" style="padding: 15px 20px; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 15px;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <span style="font-size: 0.9rem; font-weight: 600; color: var(--primary-dark);">Filter by Grade Level:</span>
+                        <select id="gradeFilterSelect" onchange="filterStudentsTable()" style="padding: 8px 15px; border-radius: 4px; border: 1px solid var(--border-light); background-color: var(--bg-cream); font-family: inherit;">
+                            <option value="all">All Grades</option>
+                            <option value="pre-grade">Pre-Grade</option>
+                            <option value="grade-1">Grade 1</option>
+                            <option value="grade-2">Grade 2</option>
+                            <option value="grade-3">Grade 3</option>
+                            <option value="grade-4">Grade 4</option>
+                            <option value="grade-5">Grade 5</option>
+                            <option value="grade-6">Grade 6</option>
+                            <option value="grade-7">Grade 7</option>
+                            <option value="grade-8">Grade 8</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="table-responsive">
+                    <table class="db-table">
+                        <thead>
+                            <tr>
+                                <th>Roll No</th>
+                                <th>Student Details</th>
+                                <th>Academic Info</th>
+                                <th>Contacts</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="studentsTableBody">
+                            <!-- Populated dynamically via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Panel D: Fees Sheet -->
+            <div class="admin-tab-panel" id="panel-fees">
+                <div class="admin-header-title">
+                    <h3>Fees Collection & Payments Tracking</h3>
+                    <button class="btn btn-accent btn-sm" onclick="simulateSendParentReminders()">📢 Send Coffee App Alert Reminders</button>
+                </div>
+                
+                <div class="table-responsive">
+                    <table class="db-table">
+                        <thead>
+                            <tr>
+                                <th>Student Roll</th>
+                                <th>Name</th>
+                                <th>Course</th>
+                                <th>Monthly Tuition Fee</th>
+                                <th>Payment Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="feesTableBody">
+                            <!-- Populated dynamically via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Panel Attendance: Mark Daily Attendance -->
+            <div class="admin-tab-panel" id="panel-attendance">
+                <div class="attendance-view-switcher" style="display: flex; gap: 15px; margin-bottom: 25px; border-bottom: 2px solid var(--border-light); padding-bottom: 15px;">
+                    <button type="button" class="btn btn-primary" id="btn-att-mark" onclick="switchAttendanceView('mark')" style="padding: 10px 20px; font-size: 0.95rem; font-weight: 600;">Mark Daily Attendance</button>
+                    <button type="button" class="btn btn-outline" id="btn-att-report" onclick="switchAttendanceView('report')" style="padding: 10px 20px; font-size: 0.95rem; font-weight: 600;">Monthly Attendance Report</button>
+                </div>
+
+                <!-- View 1: Mark Daily Attendance -->
+                <div id="attendance-mark-container" style="display: block;">
+                    <div class="admin-header-title">
+                        <h3>Student Daily Attendance Registry</h3>
+                        <div style="display: flex; gap: 10px; align-items: center;">
+                            <label for="attDate" style="font-weight: 600; font-size: 0.95rem; color: var(--primary-dark);">Date:</label>
+                            <input type="date" id="attDate" onchange="loadAttendanceSheet()" style="padding: 8px 12px; border-radius: 4px; border: 1px solid var(--border-light); background-color: var(--bg-cream); font-family: inherit; font-size: 0.95rem; font-weight: 600; color: var(--primary);">
+                        </div>
+                    </div>
+                    <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 20px;">Mark students as Present or Absent for the selected date, then click save. Data is synchronized inside the admin database.</p>
+                    
+                    <div class="admin-form-panel" style="padding: 15px 20px; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 15px;">
+                        <div style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <span style="font-size: 0.9rem; font-weight: 600; color: var(--primary-dark);">Filter by Batch:</span>
+                                <select id="attBatchFilter" onchange="loadAttendanceSheet()" style="padding: 8px 15px; border-radius: 4px; border: 1px solid var(--border-light); background-color: var(--bg-cream); font-family: inherit; font-size: 0.9rem;">
+                                    <option value="all">All Batches</option>
+                                    <option value="thursday-saturday">Thursday & Saturday</option>
+                                    <option value="saturday-sunday">Saturday & Sunday</option>
+                                    <option value="tuesday-friday">Tuesday & Friday</option>
+                                </select>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <span style="font-size: 0.9rem; font-weight: 600; color: var(--primary-dark);">Filter by Grade:</span>
+                                <select id="attGradeFilter" onchange="loadAttendanceSheet()" style="padding: 8px 15px; border-radius: 4px; border: 1px solid var(--border-light); background-color: var(--bg-cream); font-family: inherit; font-size: 0.9rem;">
+                                    <option value="all">All Grades</option>
+                                    <option value="pre-grade">Pre-Grade</option>
+                                    <option value="grade-1">Grade 1</option>
+                                    <option value="grade-2">Grade 2</option>
+                                    <option value="grade-3">Grade 3</option>
+                                    <option value="grade-4">Grade 4</option>
+                                    <option value="grade-5">Grade 5</option>
+                                    <option value="grade-6">Grade 6</option>
+                                    <option value="grade-7">Grade 7</option>
+                                    <option value="grade-8">Grade 8</option>
+                                </select>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <span style="font-size: 0.9rem; font-weight: 600; color: var(--primary-dark);">Filter by Branch:</span>
+                                <select id="attLocationFilter" onchange="loadAttendanceSheet()" style="padding: 8px 15px; border-radius: 4px; border: 1px solid var(--border-light); background-color: var(--bg-cream); font-family: inherit; font-size: 0.9rem;">
+                                    <option value="all">All Branches</option>
+                                    <option value="Velandipalayam">Velandipalayam</option>
+                                    <option value="Saravanampatty">Saravanampatty</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: 10px;">
+                            <button type="button" class="btn btn-outline btn-sm" onclick="markAllAttendance('Present')">Mark All Present</button>
+                            <button type="button" class="btn btn-outline btn-sm" onclick="markAllAttendance('Absent')" style="color: #dc3545; border-color: #dc3545;">Mark All Absent</button>
+                        </div>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="db-table">
+                            <thead>
+                                <tr>
+                                    <th>Roll No</th>
+                                    <th>Student Details</th>
+                                    <th>Schedule Batch</th>
+                                    <th style="text-align: center;">Attendance Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="attendanceTableBody">
+                                <!-- Populated dynamically via JS -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div style="display: flex; justify-content: flex-end; margin-top: 25px;">
+                        <button type="button" class="btn btn-primary" onclick="saveAttendanceSheet()" style="padding: 12px 30px; font-weight: 600; font-size: 0.95rem;">Save Daily Attendance Sheet</button>
+                    </div>
+                </div>
+
+                <!-- View 2: Monthly Attendance Report -->
+                <div id="attendance-report-container" style="display: none;">
+                    <div class="admin-header-title">
+                        <h3>Monthly Attendance Ledger</h3>
+                        <div style="display: flex; gap: 10px; align-items: center;">
+                            <label for="attReportMonth" style="font-weight: 600; font-size: 0.95rem; color: var(--primary-dark);">Month:</label>
+                            <input type="month" id="attReportMonth" onchange="loadMonthlyAttendanceReport()" style="padding: 8px 12px; border-radius: 4px; border: 1px solid var(--border-light); background-color: var(--bg-cream); font-family: inherit; font-size: 0.95rem; font-weight: 600; color: var(--primary);">
+                        </div>
+                    </div>
+                    <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 20px;">Review monthly summary statistics, total class counts, and percentage attendance rates for all active students.</p>
+
+                    <div class="admin-form-panel" style="padding: 15px 20px; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 15px;">
+                        <div style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <span style="font-size: 0.9rem; font-weight: 600; color: var(--primary-dark);">Search Student:</span>
+                                <input type="text" id="attReportSearch" oninput="loadMonthlyAttendanceReport()" placeholder="Search by name..." style="padding: 8px 12px; border-radius: 4px; border: 1px solid var(--border-light); background-color: var(--bg-cream); font-family: inherit; font-size: 0.9rem; width: 220px; box-sizing: border-box;">
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <span style="font-size: 0.9rem; font-weight: 600; color: var(--primary-dark);">Filter by Branch:</span>
+                                <select id="attReportLocationFilter" onchange="loadMonthlyAttendanceReport()" style="padding: 8px 15px; border-radius: 4px; border: 1px solid var(--border-light); background-color: var(--bg-cream); font-family: inherit; font-size: 0.9rem;">
+                                    <option value="all">All Branches</option>
+                                    <option value="Velandipalayam">Velandipalayam</option>
+                                    <option value="Saravanampatty">Saravanampatty</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="db-table">
+                            <thead>
+                                <tr>
+                                    <th>Roll No</th>
+                                    <th>Student Details</th>
+                                    <th style="text-align: center;">Month Class Summary</th>
+                                    <th>Attendance Rate (%)</th>
+                                    <th style="text-align: center;">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="attReportTableBody">
+                                <!-- Populated dynamically via JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Panel E: Website Content Manager (CMS) -->
+            <div class="admin-tab-panel" id="panel-website-manager">
+                <div class="admin-header-title">
+                    <h3>Website Content Manager (CMS)</h3>
+                </div>
+                
+                <div class="admin-form-panel">
+                    <form id="websiteManagerForm" onsubmit="saveWebsiteContent(event)">
+                        <!-- Section A: General Settings -->
+                        <fieldset style="border: 1px solid var(--border-light); padding: 20px; border-radius: 6px; margin-bottom: 25px; background: none;">
+                            <legend style="padding: 0 10px; font-weight: bold; color: var(--primary);">General Branding Settings</legend>
+                            <div class="form-row-2">
+                                <div class="form-group">
+                                    <label for="cmsAcademyName">Academy Name *</label>
+                                    <input type="text" id="cmsAcademyName" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="cmsTagline">Sanskrit / Tamil Tagline *</label>
+                                    <input type="text" id="cmsTagline" required>
+                                </div>
+                            </div>
+                            <div class="form-group" style="margin-top: 15px;">
+                                <label for="cmsLogoFile">Upload Branding Logo * (Max 1MB)</label>
+                                <input type="file" id="cmsLogoFile" accept="image/*" onchange="handleCmsImageUpload(this, 'cmsLogoPreview', 'logoPath')">
+                                <img id="cmsLogoPreview" style="max-height: 60px; margin-top: 10px; display: block; border: 1px solid var(--border-light); border-radius: 50%; object-fit: cover; width: 60px; height: 60px;">
+                            </div>
+                        </fieldset>
+
+                        <!-- Section B: Hero Banner Settings -->
+                        <fieldset style="border: 1px solid var(--border-light); padding: 20px; border-radius: 6px; margin-bottom: 25px; background: none;">
+                            <legend style="padding: 0 10px; font-weight: bold; color: var(--primary);">Hero Banner Header Settings</legend>
+                            <div class="form-group">
+                                <label for="cmsHeroTitle">Hero Title * (HTML tags allowed)</label>
+                                <input type="text" id="cmsHeroTitle" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="cmsHeroTagline">Hero Teaser Tagline *</label>
+                                <textarea id="cmsHeroTagline" rows="3" required></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="cmsHeroBgFile">Upload Hero Background Image * (Max 1MB)</label>
+                                <input type="file" id="cmsHeroBgFile" accept="image/*" onchange="handleCmsImageUpload(this, 'cmsHeroBgPreview', 'heroBg')">
+                                <img id="cmsHeroBgPreview" style="max-height: 80px; margin-top: 10px; display: block; border: 1px solid var(--border-light); border-radius: 4px;">
+                            </div>
+                        </fieldset>
+
+                        <!-- Section C: About Page Settings -->
+                        <fieldset style="border: 1px solid var(--border-light); padding: 20px; border-radius: 6px; margin-bottom: 25px; background: none;">
+                            <legend style="padding: 0 10px; font-weight: bold; color: var(--primary);">About Section Settings</legend>
+                            <div class="form-group">
+                                <label for="cmsAboutSubtitle">About Subtitle / Vision Title *</label>
+                                <input type="text" id="cmsAboutSubtitle" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="cmsAboutDesc1">Mission Statement 1 *</label>
+                                <textarea id="cmsAboutDesc1" rows="3" required></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="cmsAboutDesc2">Mission Statement 2 *</label>
+                                <textarea id="cmsAboutDesc2" rows="3" required></textarea>
+                            </div>
+                            <div class="form-row-3" style="margin-top: 15px;">
+                                <div class="form-group">
+                                    <label for="cmsAboutHeroImgFile">About Poster Image *</label>
+                                    <input type="file" id="cmsAboutHeroImgFile" accept="image/*" onchange="handleCmsImageUpload(this, 'cmsAboutHeroImgPreview', 'aboutHeroImg')">
+                                    <img id="cmsAboutHeroImgPreview" style="max-height: 60px; margin-top: 10px; display: block; border: 1px solid var(--border-light); border-radius: 4px;">
+                                </div>
+                                <div class="form-group">
+                                    <label for="cmsFounderImgFile">Founder Profile Image *</label>
+                                    <input type="file" id="cmsFounderImgFile" accept="image/*" onchange="handleCmsImageUpload(this, 'cmsFounderImgPreview', 'founderImg')">
+                                    <img id="cmsFounderImgPreview" style="max-height: 60px; width: 60px; margin-top: 10px; display: block; border: 1px solid var(--border-light); border-radius: 50%; object-fit: cover;">
+                                </div>
+                                <div class="form-group">
+                                    <label for="cmsCofounderImgFile">Co-Founder Profile Image *</label>
+                                    <input type="file" id="cmsCofounderImgFile" accept="image/*" onchange="handleCmsImageUpload(this, 'cmsCofounderImgPreview', 'cofounderImg')">
+                                    <img id="cmsCofounderImgPreview" style="max-height: 60px; width: 60px; margin-top: 10px; display: block; border: 1px solid var(--border-light); border-radius: 50%; object-fit: cover;">
+                                </div>
+                            </div>
+                        </fieldset>
+
+                        <!-- Section D: Exams Page Settings -->
+                        <fieldset style="border: 1px solid var(--border-light); padding: 20px; border-radius: 6px; margin-bottom: 25px; background: none;">
+                            <legend style="padding: 0 10px; font-weight: bold; color: var(--primary);">Exams Section Settings</legend>
+                            <div class="form-group">
+                                <label for="cmsExamTitle">Exams Heading *</label>
+                                <input type="text" id="cmsExamTitle" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="cmsExamDesc">Exams Description *</label>
+                                <textarea id="cmsExamDesc" rows="3" required></textarea>
+                            </div>
+                        </fieldset>
+
+                        <!-- Section G: What We Offer Settings -->
+                        <fieldset style="border: 1px solid var(--border-light); padding: 20px; border-radius: 6px; margin-bottom: 25px; background: none;">
+                            <legend style="padding: 0 10px; font-weight: bold; color: var(--primary);">What We Offer Section Settings</legend>
+                            <div class="form-group">
+                                <label for="cmsOfferTitle">Section Title *</label>
+                                <input type="text" id="cmsOfferTitle" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="cmsOfferDesc">Section Description *</label>
+                                <textarea id="cmsOfferDesc" rows="2" required></textarea>
+                            </div>
+                        </fieldset>
+
+                        <!-- Section H: Admissions & Calculator Settings -->
+                        <fieldset style="border: 1px solid var(--border-light); padding: 20px; border-radius: 6px; margin-bottom: 25px; background: none;">
+                            <legend style="padding: 0 10px; font-weight: bold; color: var(--primary);">Admissions & Calculator Settings</legend>
+                            <div class="form-group">
+                                <label for="cmsAdmissionTitle">Admissions Main Title *</label>
+                                <input type="text" id="cmsAdmissionTitle" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="cmsAdmissionGuidelineTitle">Guidelines Title *</label>
+                                <input type="text" id="cmsAdmissionGuidelineTitle" required>
+                            </div>
+                            <div class="form-group">
+                                <label HAROLD for="cmsAdmissionDesc1">Guidelines Paragraph 1 *</label>
+                                <textarea id="cmsAdmissionDesc1" rows="3" required></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="cmsAdmissionDesc2">Guidelines Paragraph 2 *</label>
+                                <textarea id="cmsAdmissionDesc2" rows="2" required></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="cmsAdmissionHelplineText">Helpline Display Text *</label>
+                                <input type="text" id="cmsAdmissionHelplineText" required>
+                            </div>
+                            
+                            <h4 style="color: var(--primary-light); margin-top: 15px; margin-bottom: 10px;">Calculator Tuition Fee Rates (₹)</h4>
+                            <div class="form-row-2">
+                                <div class="form-group">
+                                    <label for="cmsFeePreGrade">Pre-Grade Base Rate *</label>
+                                    <input type="number" id="cmsFeePreGrade" required min="100">
+                                </div>
+                                <div class="form-group">
+                                    <label for="cmsFeeGrade1_3">Grades 1 to 3 Base Rate *</label>
+                                    <input type="number" id="cmsFeeGrade1_3" required min="100">
+                                </div>
+                            </div>
+                            <div class="form-row-3" style="margin-top: 10px;">
+                                <div class="form-group">
+                                    <label for="cmsFeeGrade4_5">Grades 4 to 5 Base Rate *</label>
+                                    <input type="number" id="cmsFeeGrade4_5" required min="100">
+                                </div>
+                                <div class="form-group">
+                                    <label for="cmsFeeGrade6_8">Grades 6 to 8 Base Rate *</label>
+                                    <input type="number" id="cmsFeeGrade6_8" required min="100">
+                                </div>
+                                <div class="form-group">
+                                    <label for="cmsFeeWeeklyAddon">2 Classes/week Add-on *</label>
+                                    <input type="number" id="cmsFeeWeeklyAddon" required min="0">
+                                </div>
+                            </div>
+                        </fieldset>
+
+                        <!-- Section I: Branch Offices & Contact Details -->
+                        <fieldset style="border: 1px solid var(--border-light); padding: 20px; border-radius: 6px; margin-bottom: 25px; background: none;">
+                            <legend style="padding: 0 10px; font-weight: bold; color: var(--primary);">Branch Offices & Help Contacts</legend>
+                            <div class="form-row-2">
+                                <div class="form-group">
+                                    <label for="cmsContactPhone1">Primary Contact Phone * (Helpline/WhatsApp)</label>
+                                    <input type="text" id="cmsContactPhone1" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="cmsContactPhone2">Secondary Contact Phone *</label>
+                                    <input type="text" id="cmsContactPhone2" required>
+                                </div>
+                            </div>
+                            
+                            <h4 style="color: var(--primary-light); margin-top: 15px; margin-bottom: 10px;">Branch 1 Details (Velandipalayam)</h4>
+                            <div class="form-group">
+                                <label for="cmsBranch1Title">Branch 1 Title *</label>
+                                <input type="text" id="cmsBranch1Title" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="cmsBranch1Address">Branch 1 Address *</label>
+                                <textarea id="cmsBranch1Address" rows="2" required></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="cmsBranch1Phone">Branch 1 Phone *</label>
+                                <input type="text" id="cmsBranch1Phone" required>
+                            </div>
+                            
+                            <h4 style="color: var(--primary-light); margin-top: 15px; margin-bottom: 10px;">Branch 2 Details (Saravanampatty)</h4>
+                            <div class="form-group">
+                                <label for="cmsBranch2Title">Branch 2 Title *</label>
+                                <input type="text" id="cmsBranch2Title" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="cmsBranch2Address">Branch 2 Address *</label>
+                                <textarea id="cmsBranch2Address" rows="2" required></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="cmsBranch2Phone">Branch 2 Phone *</label>
+                                <input type="text" id="cmsBranch2Phone" required>
+                            </div>
+                        </fieldset>
+
+                        <!-- Section E: Security & Access -->
+                        <fieldset style="border: 1px solid var(--border-light); padding: 20px; border-radius: 6px; margin-bottom: 25px; background: none;">
+                            <legend style="padding: 0 10px; font-weight: bold; color: var(--primary);">Security Settings</legend>
+                            <div class="form-group">
+                                <label for="cmsAdminPassword">Admin Portal Login Password *</label>
+                                <input type="text" id="cmsAdminPassword" required placeholder="Default is admin123">
+                            </div>
+                        </fieldset>
+
+                        <!-- Section E2: Payment Gateway -->
+                        <fieldset style="border: 2px solid #f59e0b; padding: 20px; border-radius: 6px; margin-bottom: 25px; background: none;">
+                            <legend style="padding: 0 10px; font-weight: bold; color: #92400e;">💳 Payment Gateway (Razorpay)</legend>
+                            <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 15px;">
+                                Enter your Razorpay <strong>Key ID</strong> (starts with <code>rzp_live_</code> or <code>rzp_test_</code>). You can find this in your <a href="https://dashboard.razorpay.com/app/keys" target="_blank" style="color: var(--primary);">Razorpay Dashboard → Settings → API Keys</a>.
+                            </p>
+                            <div class="form-group">
+                                <label for="cmsRazorpayKey">Razorpay Key ID *</label>
+                                <input type="text" id="cmsRazorpayKey" placeholder="e.g. rzp_test_XXXXXXXXXX or rzp_live_XXXXXXXXXX" style="font-family: monospace; letter-spacing: 0.03em;">
+                            </div>
+                            <div id="razorpayKeyStatus" style="font-size: 0.8rem; margin-top: -8px; margin-bottom: 5px;"></div>
+                            <p style="font-size: 0.78rem; color: var(--text-muted); margin-top: 5px;">⚠️ <strong>Never</strong> enter your Razorpay <em>Secret Key</em> here. Only the <em>Key ID</em> is needed on the frontend.</p>
+                        </fieldset>
+
+                        <!-- Section F: Gallery Manager -->
+                        <fieldset style="border: 1px solid var(--border-light); padding: 20px; border-radius: 6px; margin-bottom: 25px; background: none;">
+                            <legend style="padding: 0 10px; font-weight: bold; color: var(--primary);">Gallery Manager</legend>
+                            
+                            <!-- Add New Item Form -->
+                            <h4 style="color: var(--primary-light); margin-bottom: 15px;">Add New Gallery Image</h4>
+                            <div class="form-row-2">
+                                <div class="form-group">
+                                    <label for="cmsGalleryFile">Upload Image * (Max 1MB)</label>
+                                    <input type="file" id="cmsGalleryFile" accept="image/*" onchange="handleGalleryImageUpload(this)">
+                                    <img id="cmsGalleryPreview" style="max-height: 80px; margin-top: 10px; display: none; border: 1px solid var(--border-light); border-radius: 4px;">
+                                </div>
+                                <div class="form-group">
+                                    <label for="cmsGalleryCategory">Category *</label>
+                                    <select id="cmsGalleryCategory">
+                                        <option value="dance">Dance Shows</option>
+                                        <option value="music">Music Recitals</option>
+                                        <option value="milestones">Salangai & Arangetram</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-row-2" style="margin-top: 15px;">
+                                <div class="form-group">
+                                    <label for="cmsGalleryCaption">Caption / Title *</label>
+                                    <input type="text" id="cmsGalleryCaption" placeholder="e.g. Shivaratri Performance">
+                                </div>
+                                <div class="form-group">
+                                    <label for="cmsGallerySub">Location / Subtext *</label>
+                                    <input type="text" id="cmsGallerySub" placeholder="e.g. Perur Patteswarar Temple">
+                                </div>
+                            </div>
+                            <div class="form-group" style="margin-top: 15px;">
+                                <label for="cmsGalleryDescription">Modal Description *</label>
+                                <input type="text" id="cmsGalleryDescription" placeholder="e.g. Guru Srimathi Mayuri Venkatesh performing at Perur Temple">
+                            </div>
+                            <button type="button" class="btn btn-primary btn-sm" onclick="addNewGalleryItem()" style="margin-top: 15px;">Add Image to Gallery</button>
+                            
+                            <hr style="border: 0; border-top: 1px solid var(--border-light); margin: 30px 0;">
+                            
+                            <!-- Current Items List -->
+                            <h4 style="color: var(--primary-light); margin-bottom: 15px;">Current Gallery Items</h4>
+                            <div class="table-responsive">
+                                <table class="db-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Image</th>
+                                            <th>Caption</th>
+                                            <th>Category</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="cmsGalleryTableBody">
+                                        <!-- Dynamic JavaScript Rendered -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </fieldset>
+
+                        <div style="display: flex; justify-content: flex-end; gap: 15px; margin-top: 20px;">
+                            <button type="submit" class="btn btn-primary" style="padding: 12px 30px;">Save Website Content</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Panel F: Course Manager -->
+            <div class="admin-tab-panel" id="panel-add-course">
+                <div class="admin-header-title">
+                    <h3>Course Catalog Manager</h3>
+                </div>
+
+                <div class="admin-form-panel">
+                    <h4 style="color: var(--primary-light); margin-bottom: 20px;">Active Custom Course Additions</h4>
+                    <p style="font-size: 0.9rem; margin-bottom: 25px; color: var(--text-muted);">Configure extra academy courses (e.g. Instrumental classes, Miruthangam batches) to display on the public curriculum cards.</p>
+                    
+                    <form id="addCourseForm" onsubmit="handleAddCourse(event)">
+                        <div class="form-group">
+                            <label for="courseName">Course Name *</label>
+                            <input type="text" id="courseName" required placeholder="e.g., Miruthangam Instrumental">
+                        </div>
+                        <div class="form-group">
+                            <label for="courseDesc">Description Teaser *</label>
+                            <textarea id="courseDesc" required rows="3" placeholder="Explain syllabus guidelines, gradings, timings..."></textarea>
+                        </div>
+                        <div class="form-row-2">
+                            <div class="form-group">
+                                <label for="courseCategory">Category Classification *</label>
+                                <select id="courseCategory">
+                                    <option value="dance">Classical Dance syllabus</option>
+                                    <option value="vocal">Vocal & Music syllabus</option>
+                                    <option value="instrumental">Instrumental syllabus</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="courseIcon">Display Icon (Emoji) *</label>
+                                    <input type="text" id="courseIcon" required placeholder="e.g., 🪘, 🪈, 🎤">
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Publish New Course</button>
+                    </form>
+
+                    <hr style="border: 0; border-top: 1px solid var(--border-light); margin: 30px 0;">
+
+                    <h4 style="color: var(--primary-light); margin-bottom: 15px;">Currently Published Custom Courses</h4>
+                    <div class="table-responsive">
+                        <table class="db-table">
+                            <thead>
+                                <th>Course Details</th>
+                                <th>Category</th>
+                                <th>Action</th>
+                            </thead>
+                            <tbody id="customCoursesTableBody">
+                                <!-- Populated dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Modals -->
+    <!-- 1. Add Enquiry Modal -->
+    <div class="modal-overlay" id="addEnquiryModal">
+        <div class="modal-card" style="max-width: 450px;">
+            <div class="modal-header">
+                <h3>Add Manual Enquiry</h3>
+                <button class="modal-close-btn" onclick="closeAddEnquiryModal()">
+                    <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="addEnquiryForm" onsubmit="handleAddEnquirySubmit(event)">
+                    <div class="form-group">
+                        <label for="enqName">Student Name *</label>
+                        <input type="text" id="enqName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="enqCourse">Course *</label>
+                        <select id="enqCourse" required>
+                            <option value="Bharatanatyam">Bharatanatyam</option>
+                            <option value="Carnatic Vocal">Carnatic Vocal</option>
+                            <option value="Lite Music">Lite Music</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="enqPhone">Phone Number *</label>
+                        <input type="tel" id="enqPhone" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="enqSource">Source *</label>
+                        <select id="enqSource" required>
+                            <option value="Google">Google</option>
+                            <option value="Justdial">Justdial</option>
+                            <option value="Walk-in">Walk-in</option>
+                            <option value="Flyer">Flyer</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">Save Enquiry</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. Add Student Modal -->
+    <div class="modal-overlay" id="addStudentModal">
+        <div class="modal-card" style="max-width: 500px;">
+            <div class="modal-header">
+                <h3>Add New Student Record</h3>
+                <button class="modal-close-btn" onclick="closeAddStudentModal()">
+                    <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="addStudentForm" onsubmit="handleAddStudentSubmit(event)">
+                    <div class="form-group">
+                        <label for="studName">Student Name *</label>
+                        <input type="text" id="studName" required>
+                    </div>
+                    <div class="form-row-2">
+                        <div class="form-group">
+                            <label for="studAge">Age *</label>
+                            <input type="number" id="studAge" required min="3" max="80">
+                        </div>
+                        <div class="form-group">
+                            <label for="studSchool">School Name *</label>
+                            <input type="text" id="studSchool" required>
+                        </div>
+                    </div>
+                    <div class="form-row-2">
+                        <div class="form-group">
+                            <label for="studClass">Class / Standard *</label>
+                            <input type="text" id="studClass" required placeholder="e.g. 6th Std">
+                        </div>
+                        <div class="form-group">
+                            <label for="studBatch">Select Batch *</label>
+                            <select id="studBatch" required>
+                                <option value="thursday-saturday">Thursday & Saturday</option>
+                                <option value="saturday-sunday">Saturday & Sunday</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row-2">
+                        <div class="form-group">
+                            <label for="studPhone">Parents Phone *</label>
+                            <input type="tel" id="studPhone" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="studSecondaryPhone">Secondary Phone *</label>
+                            <input type="tel" id="studSecondaryPhone" required>
+                        </div>
+                    </div>
+                    <div class="form-row-2">
+                        <div class="form-group">
+                            <label for="studProgram">Program *</label>
+                            <select id="studProgram" required>
+                                <option value="diploma">Diploma</option>
+                                <option value="arangetram">Arangetram</option>
+                                <option value="ba-bharatanatyam">B.A. Bharathanatiyam</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="studLevel">Grade Level *</label>
+                            <select id="studLevel" required>
+                                <option value="pre-grade">Pre-Grade</option>
+                                <option value="grade-1">Grade 1</option>
+                                <option value="grade-2">Grade 2</option>
+                                <option value="grade-3">Grade 3</option>
+                                <option value="grade-4">Grade 4</option>
+                                <option value="grade-5">Grade 5</option>
+                                <option value="grade-6">Grade 6</option>
+                                <option value="grade-7">Grade 7</option>
+                                <option value="grade-8">Grade 8</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="studCourse">Course *</label>
+                        <select id="studCourse" onchange="handleAdminCourseChange()" required>
+                            <option value="bharatanatyam" selected>Bharatanatyam</option>
+                            <option value="carnatic">Carnatic Music</option>
+                            <option value="litemusic">Lite Music</option>
+                        </select>
+                    </div>
+                    <div class="form-group" id="studLocationGroup" style="display: block; margin-bottom: 15px;">
+                        <label for="studLocation">Branch Location *</label>
+                        <select id="studLocation" onchange="updateAdminBatchOptions()">
+                            <option value="Velandipalayam">Velandipalayam</option>
+                            <option value="Saravanampatty">Saravanampatty</option>
+                        </select>
+                    </div>
+                    <div class="form-row-2">
+                        <div class="form-group">
+                            <label for="studFeeAmount">Monthly Tuition Fee (₹) *</label>
+                            <input type="number" id="studFeeAmount" required min="0" placeholder="e.g. 2100">
+                        </div>
+                        <div class="form-group">
+                            <label for="studPaidAmount">Paid Amount Now (₹) *</label>
+                            <input type="number" id="studPaidAmount" required min="0" placeholder="e.g. 1000">
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">Add Student</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. Receipt Lightbox Modal -->
+    <div class="modal-overlay" id="checkoutModal">
+        <div class="modal-card" style="max-width: 480px;">
+            <div class="modal-header" style="background-color: var(--primary-dark);">
+                <h3>Payment Receipt Sheet</h3>
+                <button class="modal-close-btn" onclick="closeCheckoutModal()">
+                    <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+                </button>
+            </div>
+            <div class="modal-body" style="padding: 20px;">
+                <!-- Loading State Spinner -->
+                <div id="checkoutLoadingState" style="text-align: center; padding: 40px 0; display: none; flex-direction: column; align-items: center; gap: 15px;">
+                    <div class="spinner" style="width: 50px; height: 50px; border: 5px solid var(--border-light); border-top-color: var(--primary); border-radius: 50%; animation: spin 1s linear infinite;"></div>
+                    <p style="font-weight: 600; color: var(--primary-dark);">Connecting to Bank Gateway...</p>
+                </div>
+                
+                <!-- Receipt Sheet State -->
+                <div id="checkoutReceiptState" style="display: block;">
+                    <div class="receipt-layout">
+                        <div class="text-center" style="margin-bottom: 20px;">
+                            <h4 style="font-family: 'Cinzel', serif; font-weight: 700; color: var(--primary-dark); font-size: 1.1rem; margin: 0;">Mayuri Natya Khetram</h4>
+                            <p style="font-size: 0.7rem; color: var(--text-muted); margin: 3px 0 0;">COIMBATORE • GOVT AFFILIATED syllabus</p>
+                        </div>
+                        
+                        <div class="receipt-divider"></div>
+                        
+                        <div class="receipt-row">
+                            <span>Receipt Number:</span>
+                            <span id="recNo" style="font-weight: 700;">MNK/2026/7862</span>
+                        </div>
+                        <div class="receipt-row">
+                            <span>Clearance Date:</span>
+                            <span id="recDate">03-Jul-2026 14:24</span>
+                        </div>
+                        <div class="receipt-row">
+                            <span>Student Roll No:</span>
+                            <span id="recRoll" style="font-weight: 700;">MNK-26-002</span>
+                        </div>
+                        
+                        <div class="receipt-divider"></div>
+                        
+                        <div class="receipt-row">
+                            <span>Student Name:</span>
+                            <span id="recName" style="font-weight: 700; text-transform: uppercase;">Dharshini Prasad</span>
+                        </div>
+                        <div class="receipt-row">
+                            <span>Parent Contact:</span>
+                            <span id="recPhone">99447 23209</span>
+                        </div>
+                        <div class="receipt-row">
+                            <span>Syllabus Course:</span>
+                            <span id="recCourse">Bharatanatyam</span>
+                        </div>
+                        <div class="receipt-row">
+                            <span>Grade Level:</span>
+                            <span id="recLevel">GRADE 5</span>
+                        </div>
+                        <div class="receipt-row">
+                            <span>Weekly Class Schedule:</span>
+                            <span id="recClasses">2 Classes / week</span>
+                        </div>
+                        
+                        <div class="receipt-divider"></div>
+
+                        <div class="receipt-row receipt-total">
+                            <span>Amount Paid:</span>
+                            <span id="recAmount">₹2,100.00</span>
+                        </div>
+                        <div class="receipt-row" style="font-size: 0.8rem; font-weight: bold; margin-top: 10px;">
+                            <span>Payment Status:</span>
+                            <span id="recStatus" style="color: #28a745;">SUCCESSFUL (Direct Cash Clearance)</span>
+                        </div>
+                        
+                        <p class="text-center" style="font-size: 0.75rem; color: var(--text-muted); margin-top: 25px; font-style: italic;">Your transaction record is successfully cataloged in the registry database.</p>
+                    </div>
+                    <div style="display: flex; gap: 10px; margin-top: 25px; justify-content: flex-end;">
+                        <button class="btn btn-outline btn-sm" onclick="window.print()">Print Receipt</button>
+                        <button class="btn btn-primary btn-sm" onclick="closeCheckoutModal()">Done</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 4. Detailed Student Attendance History Modal -->
+    <div class="modal-overlay" id="studentAttendanceDetailModal">
+        <div class="modal-card" style="max-width: 480px;">
+            <div class="modal-header">
+                <h3>Detailed Attendance Log</h3>
+                <button class="modal-close-btn" onclick="closeStudentAttendanceModal()">
+                    <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+                </button>
+            </div>
+            <div class="modal-body" style="padding: 20px;">
+                <div style="margin-bottom: 20px; background-color: var(--bg-cream); padding: 15px; border-radius: 6px; border: 1px solid var(--border-light);">
+                    <div style="font-size: 0.95rem; margin-bottom: 5px; color: var(--primary-dark);">Student: <strong id="attModalStudentName">Riya Krishnan</strong></div>
+                    <div style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 5px;">Roll No: <strong id="attModalRoll">MNK-26-003</strong></div>
+                    <div style="font-size: 0.9rem; color: var(--text-muted);">Report Month: <strong id="attModalMonth">July 2026</strong></div>
+                </div>
+                
+                <h5 style="margin-bottom: 10px; color: var(--primary-dark); font-weight: 600;">Attendance History Records</h5>
+                <div style="max-height: 250px; overflow-y: auto; border: 1px solid var(--border-light); border-radius: 4px;">
+                    <table class="db-table" style="margin-bottom: 0;">
+                        <thead>
+                            <tr>
+                                <th style="text-align: left; padding: 10px 15px;">Date</th>
+                                <th style="text-align: center; padding: 10px 15px;">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="attModalTableBody">
+                            <!-- Populated dynamically via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: WhatsApp Alerts Broadcast Log -->
+    <div class="modal-overlay" id="whatsappAlertModal">
+        <div class="modal-card" style="max-width: 520px;">
+            <div class="modal-header" style="background-color: #25d366; color: white;">
+                <h3 style="display: flex; align-items: center; gap: 8px; margin: 0; color: white;">
+                    <svg style="width: 24px; height: 24px; fill: currentColor;" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.724-1.455L0 24zm6.59-4.846c1.6.95 3.197 1.45 4.817 1.452 5.482 0 9.943-4.46 9.946-9.945.002-2.656-1.03-5.153-2.906-7.03C16.63 1.742 14.135.71 11.479.712c-5.485 0-9.947 4.461-9.95 9.946-.002 1.922.53 3.8 1.538 5.461L2.076 22.02l6.02-1.579c1.6.87 3.32 1.334 5.097 1.335h.013zM18.17 14.65c-.29-.145-1.72-.85-1.985-.945-.265-.1-.46-.145-.655.145-.19.29-.74.945-.905 1.135-.165.19-.33.215-.62.07-1.125-.56-1.905-.98-2.65-2.26-.195-.335-.195-.575-.02-0.78.155-.18.29-.335.435-.5.145-.165.19-.28.29-.465.1-.19.05-.35-.025-.5-.075-.15-.655-1.58-.9-2.17-.23-.57-.485-.49-.655-.5l-.56-.01c-.195 0-.51.075-.78.365-.26.29-1.005.98-1.005 2.39 0 1.41 1.03 2.78 1.17 2.97.145.19 2.03 3.1 4.916 4.35.686.297 1.22.474 1.637.607.69.22 1.317.19 1.81.116.55-.08 1.72-.7 1.96-1.375.24-.675.24-1.255.17-1.375-.075-.12-.27-.195-.56-.34z"/></svg>
+                    WhatsApp Broadcast Alerts
+                </h3>
+                <button class="modal-close-btn" onclick="closeWhatsappModal()">
+                    <svg viewBox="0 0 24 24" style="fill: white;"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+                </button>
+            </div>
+            <div class="modal-body" style="padding: 20px;">
+                <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 20px;">
+                    The following WhatsApp message alerts have been simulated and dispatched to parents of absent students:
+                </p>
+                <div id="whatsappAlertsContainer" style="display: flex; flex-direction: column; gap: 15px; max-height: 300px; overflow-y: auto; padding-right: 5px;">
+                    <!-- Appended dynamically -->
+                </div>
+                <div style="display: flex; justify-content: flex-end; margin-top: 25px;">
+                    <button class="btn btn-primary" onclick="closeWhatsappModal()">Understood</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Record Payment Modal -->
+    <div class="modal-overlay" id="recordPaymentModal">
+        <div class="modal-card" style="max-width: 450px;">
+            <div class="modal-header" style="background-color: var(--primary-dark);">
+                <h3 style="color: white; margin: 0;">Record Student Fee Payment</h3>
+                <button class="modal-close-btn" onclick="closeRecordPaymentModal()">
+                    <svg viewBox="0 0 24 24" style="fill: white;"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+                </button>
+            </div>
+            <div class="modal-body" style="padding: 20px;">
+                <form id="recordPaymentForm" onsubmit="saveFeePayment(event)">
+                    <input type="hidden" id="payStudentRoll">
+                    
+                    <div style="background-color: var(--bg-cream); padding: 15px; border-radius: 6px; margin-bottom: 20px; border: 1px solid var(--border-light); box-sizing: border-box;">
+                        <p style="margin: 0 0 8px; font-weight: 700; color: var(--primary-dark); font-size: 0.95rem;" id="payStudentName">Student Name: -</p>
+                        <p style="margin: 0 0 8px; font-size: 0.9rem; color: var(--text-dark);" id="payStudentCourse">Course: -</p>
+                        <p style="margin: 0 0 8px; font-size: 0.9rem; font-weight: 600; color: var(--text-dark);" id="payTotalDue">Total Fee Due: ₹0</p>
+                        <p style="margin: 0; font-size: 0.9rem; color: #16a34a; font-weight: 600;" id="payAlreadyPaid">Already Paid: ₹0</p>
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 15px;">
+                        <label for="payAmount" style="font-weight: 600; display: block; margin-bottom: 6px;">Paid Tuition Fee Amount (₹) *</label>
+                        <input type="number" id="payAmount" required min="1" placeholder="Enter amount to pay" style="width: 100%; padding: 10px; border-radius: 4px; border: 1px solid var(--border-light); font-size: 1.1rem; font-weight: 700; text-align: center; color: var(--primary); box-sizing: border-box;" oninput="calculateRemainingBalance()">
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 20px;">
+                        <label for="payMethod" style="font-weight: 600; display: block; margin-bottom: 6px;">Payment Method *</label>
+                        <select id="payMethod" required style="width: 100%; padding: 10px; border-radius: 4px; border: 1px solid var(--border-light); font-size: 1rem; background-color: white; box-sizing: border-box;">
+                            <option value="Hand Cash" selected>Hand Cash</option>
+                            <option value="Online Transfer">Online Transfer</option>
+                            <option value="Razorpay Gateway">Razorpay Gateway</option>
+                        </select>
+                    </div>
+
+                    <div id="payBalanceIndicator" style="margin-top: 15px; font-weight: 600; font-size: 0.95rem; display: none; padding: 10px; border-radius: 4px; text-align: center;">
+                        Remaining Pending Balance: ₹0
+                    </div>
+
+                    <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 20px; padding: 12px; font-size: 1rem; font-weight: 600;">Save Payment</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin JS logic file with cache buster -->
+    <script>
+        const script = document.createElement('script');
+        script.src = 'admin.js?v=' + Date.now();
+        document.body.appendChild(script);
+    </script>
+</body>
+</html>

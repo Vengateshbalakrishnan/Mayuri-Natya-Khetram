@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mayuri Natya Khetram - Classical Dance & Music Academy</title>
+    <meta name="description" content="Mayuri Natya Khetram is Coimbatore's premier institution affiliated with Tamil Nadu Dr. J. Jayalalithaa Music and Fine Arts University and Bridge Academy. We offer Bharatanatyam and Carnatic Music training.">
+    <link rel="stylesheet" href="style.css">
+    
+    <!-- Supabase JS Client Library CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Razorpay Standard Checkout SDK -->
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+</head>
+<body>
+
+    <!-- Toast Notifications Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Top Contact Bar -->
+    <div class="top-bar">
+        <div class="container top-bar-content">
+            <div class="top-bar-info">
+                <span>
+                    <svg viewBox="0 0 24 24"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
+                    86755 39678 | 99447 23209
+                </span>
+                <span>
+                    <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+                    guru@mayurinatyakshetra.com
+                </span>
+            </div>
+            <div class="top-bar-socials">
+                <a href="#" aria-label="Facebook">
+                    <svg viewBox="0 0 24 24"><path d="M5 3h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2m13 2h-2.5A3.5 3.5 0 0 0 12 8.5V11h-2v3h2v7h3v-7h3v-3h-3V9a1 1 0 0 1 1-1h2V5z"/></svg>
+                </a>
+                <a href="#" aria-label="Instagram">
+                    <svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.051.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/></svg>
+                </a>
+                <a href="#" aria-label="YouTube">
+                    <svg viewBox="0 0 24 24"><path d="M10 15l5.19-3L10 9v6m11.56-7.83c.13.47.22 1.1.28 1.9.07.8.1 1.49.1 2.1v1.66c0 .6-.03 1.29-.1 2.1-.06.8-.15 1.43-.28 1.9-.21.78-.77 1.35-1.52 1.51-1.19.33-4.05.33-4.05.33s-2.86 0-4.05-.33c-.75-.16-1.31-.73-1.52-1.51-.13-.47-.22-1.1-.28-1.9-.07-.8-.1-1.49-.1-2.1v-1.66c0-.6.03-1.29.1-2.1.06-.8.15-1.43.28-1.9.21-.78.77-1.35 1.52-1.51C8.14 5 11 5 11 5s2.86 0 4.05.33c.75.16 1.31.73 1.52 1.51z"/></svg>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sticky Main Navigation -->
+    <header>
+        <div class="container header-container">
+            <a href="#home" class="logo-link">
+                <img id="headerLogo" src="assets/logo_peacock.png" alt="Mayuri Natya Khetram Logo" class="logo-img">
+                <div class="logo-text">
+                    <h1 id="headerAcademyName">Mayuri Natya Khetram</h1>
+                    <span id="headerTagline">கலையின் வழியே இறைவனை உணரலாம்</span>
+                </div>
+            </a>
+            <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu">
+                <svg viewBox="0 0 24 24"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>
+            </button>
+            <nav id="navMenu">
+                <ul class="nav-list">
+                    <li><a href="#home" class="nav-link active" id="nav-home">Home</a></li>
+                    <li><a href="#about" class="nav-link" id="nav-about">About</a></li>
+                    <li><a href="#courses" class="nav-link" id="nav-courses">Courses</a></li>
+                    <li><a href="#gallery" class="nav-link" id="nav-gallery">Gallery</a></li>
+                    <li><a href="#admissions" class="nav-link" id="nav-admissions">Admissions</a></li>
+                    <li><a href="#contact" class="nav-link" id="nav-contact">Contact</a></li>
+                </ul>
+                <a href="#contact" class="btn btn-primary btn-sm">Enquire Now</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content Dynamic Container -->
+    <main>
+
+        <!-- 1. HOME VIEW -->
+        <section id="home" class="view-section active-view">
+            <!-- Hero Section -->
+            <div class="hero" id="heroSection">
+                <div class="container">
+                    <div class="hero-content">
+                        <span class="hero-tag">Coimbatore's Affiliated Fine Arts Institution</span>
+                        <h2 id="heroTitle">Nurturing Art.<br>Inspiring Lives.</h2>
+                        <p id="heroTagline">Providing government-recognized classical dance & music education under qualified Gurus. Affiliated with Tamil Nadu Dr. J. Jayalalithaa Music and Fine Arts University.</p>
+                        <div class="hero-actions">
+                            <a href="#admissions" class="btn btn-accent">Join a Consultation</a>
+                            <a href="#courses" class="btn btn-outline" style="color: white; border-color: white;">Explore Courses</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Statistics Counters Bar -->
+            <div class="counters-bar">
+                <div class="container counters-grid">
+                    <div class="counter-item">
+                        <span class="counter-icon">🏛️</span>
+                        <span class="counter-number" data-target="1">0</span>
+                        <span class="counter-label">Coimbatore's Only Affiliated Academy</span>
+                    </div>
+                    <div class="counter-item">
+                        <span class="counter-icon">⭐</span>
+                        <span class="counter-number" data-target="12">0</span>
+                        <span class="counter-label">Years of Excellence</span>
+                    </div>
+                    <div class="counter-item">
+                        <span class="counter-icon">👥</span>
+                        <span class="counter-number" data-target="500">0</span>
+                        <span class="counter-label">Happy Students</span>
+                    </div>
+                    <div class="counter-item">
+                        <span class="counter-icon">🎭</span>
+                        <span class="counter-number" data-target="100">0</span>
+                        <span class="counter-label">Performances Staged</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- What We Offer Section -->
+            <div class="section-padding">
+                <div class="container">
+                    <div class="section-header">
+                        <span class="badge badge-primary">Curriculum</span>
+                        <h2 id="offerTitle">What We Offer</h2>
+                        <div class="divider-ornament">❀ ─── ✿ ─── ❀</div>
+                        <p id="offerDesc">We provide comprehensive and structured training in traditional art forms with certified gradings.</p>
+                    </div>
+
+                    <div class="offerings-grid" id="publicCoursesGrid">
+                        <!-- Bharatanatyam Card -->
+                        <div class="course-card">
+                            <div class="course-img-wrapper">
+                                <img src="assets/guru_pose4.jpg" alt="Bharatanatyam" class="course-img">
+                                <div class="course-overlay">
+                                    <span class="badge badge-accent">Grade Course</span>
+                                </div>
+                            </div>
+                            <div class="course-body">
+                                <h3>Bharatanatyam</h3>
+                                <p>Learn the divine temple dance form involving Adavus, Nritta, Abhinaya, and detailed expressions. Affiliated with Tamil Nadu Dr. J. Jayalalithaa Music & Fine Arts University.</p>
+                                <div class="course-meta">
+                                    <span class="course-affiliation">TNJJMFAU Affiliated</span>
+                                    <a href="#courses" class="course-link">Syllabus Details →</a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Carnatic Music Card -->
+                        <div class="course-card">
+                            <div class="course-img-wrapper">
+                                <img src="assets/course_carnatic.jpg" alt="Carnatic Vocal" class="course-img">
+                                <div class="course-overlay">
+                                    <span class="badge badge-accent">8 Grades</span>
+                                </div>
+                            </div>
+                            <div class="course-body">
+                                <h3>Carnatic Music</h3>
+                                <p>Comprehensive vocal coaching starting from basic Sarali Varisai to advanced Kritis, following the Bridge Academy 8-tier syllabus under professional guidance.</p>
+                                <div class="course-meta">
+                                    <span class="course-affiliation">Bridge Academy Syllabus</span>
+                                    <a href="#courses" class="course-link">Syllabus Details →</a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Lite Music Card -->
+                        <div class="course-card">
+                            <div class="course-img-wrapper">
+                                <img src="assets/course_litemusic.jpg" alt="Lite Music" class="course-img">
+                                <div class="course-overlay">
+                                    <span class="badge badge-accent">Vocal & Melodies</span>
+                                </div>
+                            </div>
+                            <div class="course-body">
+                                <h3>Lite Music</h3>
+                                <p>Learn popular melodies, cinema tracks, devotional bhajan recitals, and microphone stage techniques under Co-Founder Venkatesh Balakrishnan.</p>
+                                <div class="course-meta">
+                                    <span class="course-affiliation">In-house Certified</span>
+                                    <a href="#courses" class="course-link">Syllabus Details →</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Split Section: Events & Affiliations -->
+            <div class="section-padding" style="background-color: var(--bg-white); border-top: 1px solid var(--border-light);">
+                <div class="container home-split-grid">
+                    <!-- Upcoming Events Panel -->
+                    <div class="upcoming-events-panel">
+                        <h3 class="brand-title">Upcoming Performances</h3>
+                        <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 20px;">Join and support our students in their artistic achievements.</p>
+                        
+                        <div class="events-list">
+                            <!-- Event 1 -->
+                            <div class="event-card">
+                                <div class="event-date">
+                                    <span class="day">26</span>
+                                    <span class="month">Feb</span>
+                                </div>
+                                <div class="event-info">
+                                    <h4>5th Year Natya Samarpanam</h4>
+                                    <p>Celebrated on Maha Shivaratri at the historic Perur Patteswarar Temple.</p>
+                                    <div class="event-details-meta">Time: 6:00 PM onwards | Open for All</div>
+                                </div>
+                            </div>
+
+                            <!-- Event 2 -->
+                            <div class="event-card">
+                                <div class="event-date">
+                                    <span class="day">15</span>
+                                    <span class="month">May</span>
+                                </div>
+                                <div class="event-info">
+                                    <h4>Salangai Poojai Celebrations</h4>
+                                    <p>Marking the transition milestone of senior batches into advanced Adavus.</p>
+                                    <div class="event-details-meta">Velandipalayam Auditorium | Invite Only</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Why Choose Us Panel -->
+                    <div class="why-choose-panel">
+                        <h3 class="brand-title">Why Choose Us?</h3>
+                        <ul class="why-list">
+                            <li>
+                                <svg viewBox="0 0 20 20"><path d="M7.629 14.571L3.125 10.068l1.413-1.413 3.093 3.093 7.625-7.625 1.413 1.412-9.04 9.036z"/></svg>
+                                <span>Coimbatore's <strong>only</strong> institution affiliated with the Tamil Nadu Dr. J. Jayalalithaa Music and Fine Arts University.</span>
+                            </li>
+                            <li>
+                                <svg viewBox="0 0 20 20"><path d="M7.629 14.571L3.125 10.068l1.413-1.413 3.093 3.093 7.625-7.625 1.413 1.412-9.04 9.036z"/></svg>
+                                <span>Government-recognized art forms at highly affordable and structured pricing.</span>
+                            </li>
+                            <li>
+                                <svg viewBox="0 0 20 20"><path d="M7.629 14.571L3.125 10.068l1.413-1.413 3.093 3.093 7.625-7.625 1.413 1.412-9.04 9.036z"/></svg>
+                                <span>Double affiliation including Bridge Academy's 8-tier grade system for Carnatic Music.</span>
+                            </li>
+                            <li>
+                                <svg viewBox="0 0 20 20"><path d="M7.629 14.571L3.125 10.068l1.413-1.413 3.093 3.093 7.625-7.625 1.413 1.412-9.04 9.036z"/></svg>
+                                <span>Experienced gurus with academic excellence (M.A, M.Phil, and PhD research background).</span>
+                            </li>
+                        </ul>
+
+                        <div class="affiliate-badge">
+                            <img src="assets/logo_peacock.png" alt="Affiliated" class="affiliate-logo">
+                            <div class="affiliate-text">
+                                <h5>University & Academy Affiliated</h5>
+                                <p>Providing accredited certificate and degree syllabus courses in Coimbatore.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Parent Testimonials Section -->
+            <div class="section-padding testimonials-section">
+                <div class="container">
+                    <div class="section-header">
+                        <span class="badge badge-primary">Feedbacks</span>
+                        <h2>Parent Testimonials</h2>
+                    </div>
+
+                    <div class="testimonial-container">
+                        <div class="testimonial-slider" id="testimonialSlider">
+                            <!-- Testimonial 1 -->
+                            <div class="testimonial-slide">
+                                <div class="quote-icon">“</div>
+                                <p class="testimonial-text">The training, discipline and values taught here are truly exceptional. My daughter has grown in confidence and grace since joining the academy.</p>
+                                <h4 class="testimonial-author">Srimathi Rajeshwari</h4>
+                                <span class="testimonial-subtitle">Parent of Grade 2 Student - Velandipalayam</span>
+                            </div>
+                            <!-- Testimonial 2 -->
+                            <div class="testimonial-slide">
+                                <div class="quote-icon">“</div>
+                                <p class="testimonial-text">Attending the Carnatic Music classes has been wonderful. The grading system under Bridge Academy provides a clear goals-based milestone approach.</p>
+                                <h4 class="testimonial-author">Mr. Balasubramanian</h4>
+                                <span class="testimonial-subtitle">Parent of Grade 4 Music Student</span>
+                            </div>
+                            <!-- Testimonial 3 -->
+                            <div class="testimonial-slide">
+                                <div class="quote-icon">“</div>
+                                <p class="testimonial-text">Very structured and methodical teaching. Having university-accredited certifications right here in Coimbatore makes a massive difference.</p>
+                                <h4 class="testimonial-author">Dr. Anandhi Krishnan</h4>
+                                <span class="testimonial-subtitle">Parent of Grade 1 Student - Saravanampatty</span>
+                            </div>
+                        </div>
+
+                        <div class="testimonial-dots" id="sliderDots">
+                            <span class="dot active" data-index="0"></span>
+                            <span class="dot" data-index="1"></span>
+                            <span class="dot" data-index="2"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. ABOUT US VIEW -->
+        <section id="about" class="view-section section-padding">
+            <div class="container">
+                <div class="section-header">
+                    <span class="badge badge-primary">Our Story</span>
+                    <h2>About Mayuri Natya Khetram</h2>
+                    <div class="divider-ornament">❀ ─── ✿ ─── ❀</div>
+                </div>
+
+                <div class="about-hero-grid">
+                    <img id="aboutHeroImg" src="assets/guru_pose4.jpg" alt="Mayuri Natya Khetram Practice" class="about-hero-img">
+                    <div class="about-hero-content">
+                        <h3 id="aboutSubtitle">Nurturing Art and Inspiring Value-Based Lives</h3>
+                        <p id="aboutDesc1">Established with the vision of promoting classical Indian art forms, Mayuri Natya Khetram stands as a lighthouse of traditional art in Coimbatore. We guide students from their first steps to advanced university level examinations.</p>
+                        <p id="aboutDesc2">Through our affiliations, our students earn certificates that are recognized by the Government of Tamil Nadu, creating opportunities for academic credit, career growth in art education, and cultural portfolios.</p>
+                    </div>
+                </div>
+
+                <!-- Founders Section -->
+                <div class="section-header">
+                    <h2>Academy Founders & Faculty</h2>
+                    <div class="divider-ornament">❀ ─── ✿ ─── ❀</div>
+                </div>
+
+                <div class="founders-grid">
+                    <!-- Founder -->
+                    <div class="founder-card">
+                        <img id="founderImg" src="assets/guru_avatar.jpg" alt="Guru Srimathi Mayuri Venkatesh" class="founder-avatar">
+                        <h4 id="founderName">Guru Srimathi Mayuri Venkatesh</h4>
+                        <div class="founder-role">Founder & Principal Guru</div>
+                        <p style="font-weight: 600; color: var(--primary-light); font-size: 0.95rem; margin-bottom: 10px;">B.A, M.A, M.Phil, Ph.D. (Ongoing)</p>
+                        <p class="founder-bio">A dedicated Bharatanatyam researcher, educator, and choreographer. With extensive academic credentials in dance theory and performance, she personally coordinates the university grade syllabus, ensuring high standards of technical purity in every batch.</p>
+                    </div>
+
+                    <!-- Co-Founder -->
+                    <div class="founder-card">
+                        <img id="cofounderImg" src="assets/guru_cofounder.jpg" alt="Venkatesh Balakrishnan" class="founder-avatar">
+                        <h4 id="cofounderName">Venkatesh Balakrishnan</h4>
+                        <div class="founder-role">Co-Founder & Administrator</div>
+                        <p class="founder-bio">Managing the strategic partnerships, operations, and technical expansion. He coordinates the Carnatic Music program alongside visiting faculty and ensures all administrative consoles run smoothly for parent communications.</p>
+                    </div>
+                </div>
+
+                <!-- Faculty Details -->
+                <div class="faculty-section">
+                    <div class="section-header" style="margin-bottom: 30px;">
+                        <h3>Carnatic Music Faculty</h3>
+                    </div>
+                    <div class="faculty-grid">
+                        <div class="faculty-card">
+                            <div class="faculty-avatar" style="background-color: var(--accent); display: flex; align-items: center; justify-content: center; color: var(--primary-dark); font-size: 2.5rem; font-weight: bold; margin: 0 auto 15px;">MK</div>
+                            <h4>Guru Shri Muralikrishna</h4>
+                            <div class="founder-role">Senior Music Faculty</div>
+                            <p class="founder-bio" style="font-size: 0.9rem;">Expert vocalist who coordinates the 8-tier grade syllabus of Bridge Academy alongside Venkatesh Balakrishnan.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. COURSES VIEW -->
+        <section id="courses" class="view-section section-padding">
+            <div class="container">
+                <div class="section-header">
+                    <span class="badge badge-primary">Curriculums</span>
+                    <h2>Academic Courses & Milestones</h2>
+                    <div class="divider-ornament">❀ ─── ✿ ─── ❀</div>
+                </div>
+
+                <!-- Dynamic courses container (will render custom courses here as well) -->
+                <div id="dynamicCoursesList">
+                    <!-- Bharatanatyam Detail -->
+                    <div class="course-detail-panel" id="detail-bharatanatyam">
+                        <div class="course-detail-header">
+                            <h3>Bharatanatyam Curriculum</h3>
+                            <span class="badge badge-accent">University Affiliated</span>
+                        </div>
+                        <p>Our Bharatanatyam syllabus follows the traditional Melattur style with focus on rhythmic precision (Laya), expressive storytelling (Bhava), and structural purity. Affiliated with Tamil Nadu Dr. J. Jayalalithaa Music and Fine Arts University, students take yearly theoretical and practical examinations to progress through standard grades.</p>
+                        
+                        <div class="milestones-grid">
+                            <!-- Milestone 1 -->
+                            <div class="milestone-card">
+                                <h4>Salangai Poojai</h4>
+                                <div class="badge badge-primary" style="margin-bottom: 10px;">2 to 4 Years</div>
+                                <p>The initial major milestone. Once a student completes the study of all basic Adavus (steps), demonstrating correct posture and rhythm, they receive the Guru's recognition to perform in a dedicated ceremony, wearing the ankle bells (Salangai) for the first time.</p>
+                            </div>
+
+                            <!-- Milestone 2 -->
+                            <div class="milestone-card">
+                                <h4>Arangetram</h4>
+                                <div class="badge badge-accent" style="margin-bottom: 10px;">8+ Years</div>
+                                <p>The graduation milestone representing solo stage entry. Achieved after at least 8 years of rigorous training, learning complete Margam compositions, and demonstrating absolute mastery. It requires the Guru's formal approval and showcases the dancer’s endurance and artistic depth.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Carnatic Music Detail -->
+                    <div class="course-detail-panel" id="detail-carnatic">
+                        <div class="course-detail-header">
+                            <h3>Carnatic Vocal Music</h3>
+                            <span class="badge badge-accent">Bridge Academy Affiliated</span>
+                        </div>
+                        <p>Our Carnatic Music training is structured in tie-up with Bridge Academy, taking vocal students through a highly systemized 8-Grade syllabus. Training covers vocal exercises, pitch stabilization, rhythmic timing (Tala), and classical compositions from legendary vaggeyakaras.</p>
+                        
+                        <div class="grades-timeline">
+                            <div class="timeline-item">
+                                <h5>Grades 1 & 2: Foundations</h5>
+                                <p>Focus on Sarali Varisai, Jantai Varisai, Dhattu Varisai, and Alankarams in multiple speeds with pitch maintenance.</p>
+                            </div>
+                            <div class="timeline-item">
+                                <h5>Grades 3, 4 & 5: Intermediate</h5>
+                                <p>Introduction to Geethams, Swarajathis, and Lakshana Geethas. Understanding basic ragas and talas.</p>
+                            </div>
+                            <div class="timeline-item">
+                                <h5>Grades 6, 7 & 8: Advanced Masteries</h5>
+                                <p>Varnams, complex Kritis in multiple ragas, and introductory Manodharma Sangeetham (creative improvisation).</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Lite Music Detail -->
+                    <div class="course-detail-panel" id="detail-litemusic">
+                        <div class="course-detail-header">
+                            <h3>Lite Music Curriculum</h3>
+                            <span class="badge badge-accent">In-house Grade System</span>
+                        </div>
+                        <p>Our Lite Music course is designed for students who want to explore light classical music, devotional songs, bhajan recitals, and popular film melodies. Under the training of Co-Founder Venkatesh Balakrishnan, students learn to control pitch, adapt to karaoke backing tracks, and master mic stage presence.</p>
+                        
+                        <div class="milestones-grid">
+                            <div class="milestone-card">
+                                <h4>Vocal Modulation</h4>
+                                <div class="badge badge-primary" style="margin-bottom: 10px;">Level 1 & 2</div>
+                                <p>Voice culture techniques adjusted specifically for light genres, handling soft transitions, range extensions, and vocal dynamics.</p>
+                            </div>
+                            <div class="milestone-card">
+                                <h4>Stage Techniques</h4>
+                                <div class="badge badge-accent" style="margin-bottom: 10px;">Performance</div>
+                                <p>Microphone handling, body posture, managing stage fright, and coordination with backing tracks or live accompaniments.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- 5. GALLERY VIEW -->
+        <section id="gallery" class="view-section section-padding">
+            <div class="container">
+                <div class="section-header">
+                    <span class="badge badge-primary">Moments</span>
+                    <h2>Accolades & Memories</h2>
+                    <div class="divider-ornament">❀ ─── ✿ ─── ❀</div>
+                </div>
+
+                <div class="gallery-filters">
+                    <button class="gallery-filter-btn active-filter" onclick="filterGallery('all')">All Memories</button>
+                    <button class="gallery-filter-btn" onclick="filterGallery('dance')">Dance Shows</button>
+                    <button class="gallery-filter-btn" onclick="filterGallery('music')">Music Recitals</button>
+                    <button class="gallery-filter-btn" onclick="filterGallery('milestones')">Salangai & Arangetram</button>
+                </div>
+
+                <div class="gallery-grid" id="galleryGrid">
+                    <!-- Javascript Populated -->
+                </div>
+            </div>
+        </section>
+
+        <!-- 6. ADMISSIONS VIEW -->
+        <section id="admissions" class="view-section section-padding">
+            <div class="container">
+                <div class="section-header">
+                    <span class="badge badge-primary">Join Us</span>
+                    <h2 id="admissionTitle">Admission Form & Fee Estimator</h2>
+                    <div class="divider-ornament">❀ ─── ✿ ─── ❀</div>
+                </div>
+
+                <div class="admissions-layout">
+                    <!-- Admissions Details -->
+                    <div class="admissions-info">
+                        <h3 id="admissionGuidelineTitle">Registration Guidelines</h3>
+                        <p id="admissionDesc1">We welcome students of all age groups. Beginners are placed in the Pre-Grade foundational batches, while transfer students with prior dance/music experience will undergo a brief placement session to assess their corresponding grade level (Grades 1 to 8).</p>
+                        <p id="admissionDesc2"><strong>Note on fee deadlines:</strong> Fees are collected before the 10th of every month. Payments can be tracked directly from the parent dashboard, and receipts are generated instantly.</p>
+                        
+                        <div class="contact-info-cards" style="margin-top: 30px;">
+                            <div class="contact-info-card">
+                                <span class="contact-card-icon">📞</span>
+                                <div class="contact-card-text">
+                                    <h4>Admission Helpline</h4>
+                                    <p id="admissionHelplineText">86755 39678 | 99447 23209</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Dynamic Calculator Panel -->
+                    <div class="calculator-panel">
+                        <h3 class="brand-title" style="margin-bottom: 20px; font-size: 1.3rem;">Calculate Admission Fees</h3>
+                        <form id="admissionForm" onsubmit="handleAdmissionSubmit(event)">
+                            <div class="form-group">
+                                <label for="admName">Student Name *</label>
+                                <input type="text" id="admName" required placeholder="Enter student name">
+                            </div>
+                            <div class="form-row-2">
+                                <div class="form-group">
+                                    <label for="admAge">Age *</label>
+                                    <input type="number" id="admAge" required min="3" max="80" placeholder="Student age">
+                                </div>
+                                <div class="form-group">
+                                    <label for="admSchool">School Name *</label>
+                                    <input type="text" id="admSchool" required placeholder="Enter school name">
+                                </div>
+                            </div>
+                            <div class="form-row-2">
+                                <div class="form-group">
+                                    <label for="admClass">Class / Standard *</label>
+                                    <input type="text" id="admClass" required placeholder="e.g. 5th Standard">
+                                </div>
+                                <div class="form-group">
+                                    <label for="admBatch">Select Batch *</label>
+                                    <select id="admBatch" required>
+                                        <option value="thursday-saturday">Thursday & Saturday</option>
+                                        <option value="saturday-sunday" selected>Saturday & Sunday</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-row-2">
+                                <div class="form-group">
+                                    <label for="admPhone">Parents Phone Number *</label>
+                                    <input type="tel" id="admPhone" required placeholder="Primary contact number">
+                                </div>
+                                <div class="form-group">
+                                    <label for="admSecondaryPhone">Secondary Phone Number *</label>
+                                    <input type="tel" id="admSecondaryPhone" required placeholder="Secondary contact number">
+                                </div>
+                            </div>
+                            <div class="form-row-2">
+                                <div class="form-group">
+                                    <label for="admProgram">Select Program *</label>
+                                    <select id="admProgram" required>
+                                        <option value="diploma">Diploma</option>
+                                        <option value="arangetram">Arangetram</option>
+                                        <option value="ba-bharatanatyam">B.A. Bharathanatiyam</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="admLevel">Grade Level *</label>
+                                    <select id="admLevel" onchange="calculateAdmissionFees()" required>
+                                        <option value="pre-grade">Pre-Grade</option>
+                                        <option value="grade-1">Grade 1</option>
+                                        <option value="grade-2">Grade 2</option>
+                                        <option value="grade-3">Grade 3</option>
+                                        <option value="grade-4">Grade 4</option>
+                                        <option value="grade-5">Grade 5</option>
+                                        <option value="grade-6">Grade 6</option>
+                                        <option value="grade-7">Grade 7</option>
+                                        <option value="grade-8">Grade 8</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="admCourse">Select Course *</label>
+                                <select id="admCourse" onchange="handleCourseChange()" required>
+                                    <option value="bharatanatyam" selected>Bharatanatyam</option>
+                                    <option value="carnatic">Carnatic Music</option>
+                                    <option value="litemusic">Lite Music</option>
+                                </select>
+                            </div>
+
+                            <!-- Location Dropdown (Visible only for Bharatanatyam) -->
+                            <div class="form-group" id="locationGroup" style="display: block; margin-bottom: 20px;">
+                                <label for="admLocation" style="font-weight: 600;">Select Branch Location *</label>
+                                <select id="admLocation" onchange="updateAdmBatchOptions()" style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid var(--border-light); font-size: 1rem; background-color: var(--bg-cream);">
+                                    <option value="Velandipalayam">Velandipalayam</option>
+                                    <option value="Saravanampatty">Saravanampatty</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="admFee" style="font-weight: 600;">Monthly Tuition Fee (₹) *</label>
+                                <input type="number" id="admFee" required min="0" placeholder="e.g. 1500" style="width: 100%; padding: 12px; border-radius: 6px; border: 1px solid var(--border-light); font-size: 1.25rem; font-weight: 700; color: var(--primary); text-align: center; background-color: var(--bg-cream); box-sizing: border-box;">
+                            </div>
+
+                            <div class="form-group" style="display:none;">
+                                <input type="hidden" id="admSource" value="Website Admission Form">
+                            </div>
+
+                            <button type="submit" class="btn btn-primary" style="width: 100%; padding: 14px; font-size: 1.05rem; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 10px;">
+                                <svg viewBox="0 0 24 24" style="width:20px;height:20px;fill:white;"><path d="M20 4H4c-1.11 0-2 .89-2 2v12c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z"/></svg>
+                                Pay Now with Razorpay
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 8. CONTACT VIEW -->
+        <section id="contact" class="view-section section-padding">
+            <div class="container">
+                <div class="section-header">
+                    <span class="badge badge-primary">Get in Touch</span>
+                    <h2>Contact & Branch Locations</h2>
+                    <div class="divider-ornament">❀ ─── ✿ ─── ❀</div>
+                </div>
+
+                <div class="contact-grid">
+                    <!-- Branch Details -->
+                    <div class="contact-info-cards">
+                        <!-- Branch 1 -->
+                        <div class="contact-info-card" style="border-left: 4px solid var(--primary);">
+                            <div class="contact-card-text">
+                                <h3 style="color: var(--primary);" id="branch1Title">Velandipalayam Branch</h3>
+                                <p style="margin: 10px 0;" id="branch1Address">No. 42, Karpagam Complex, Velandipalayam, Coimbatore – 641025.</p>
+                                <p style="font-weight: 600;" id="branch1Phone">📞 86755 39678</p>
+                                <button class="btn btn-primary btn-sm" style="margin-top: 15px;" onclick="openMapModal(getWebContent().branch1Title + ' Map', getWebContent().branch1Address)">View on Map</button>
+                            </div>
+                        </div>
+
+                        <!-- Branch 2 -->
+                        <div class="contact-info-card" style="border-left: 4px solid var(--accent);">
+                            <div class="contact-card-text">
+                                <h3 style="color: var(--primary-dark);" id="branch2Title">Saravanampatty Branch</h3>
+                                <p style="margin: 10px 0;" id="branch2Address">No. 5/21, KRS Nagar, Saravanampatty, Coimbatore – 641035.</p>
+                                <p style="font-weight: 600;" id="branch2Phone">📞 99447 23209</p>
+                                <button class="btn btn-accent btn-sm" style="margin-top: 15px;" onclick="openMapModal(getWebContent().branch2Title + ' Map', getWebContent().branch2Address)">View on Map</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Direct Message Form -->
+                    <div class="calculator-panel">
+                        <h3 class="brand-title" style="margin-bottom: 20px;">Send a Direct Message</h3>
+                        <form id="contactForm" onsubmit="handleContactSubmit(event)">
+                            <div class="form-group">
+                                <label for="cName">Your Name *</label>
+                                <input type="text" id="cName" required placeholder="Enter name">
+                            </div>
+                            <div class="form-row-2">
+                                <div class="form-group">
+                                    <label for="cPhone">Phone Number *</label>
+                                    <input type="tel" id="cPhone" required placeholder="Enter phone number">
+                                </div>
+                                <div class="form-group">
+                                    <label for="cEmail">Email Address</label>
+                                    <input type="email" id="cEmail" placeholder="Enter email">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="cMessage">Message *</label>
+                                <textarea id="cMessage" rows="4" required placeholder="Write your enquiry details here..."></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary" style="width: 100%;">Send Message</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer Section -->
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-logo">
+                    <img id="footerLogo" src="assets/logo_peacock.png" alt="Logo" style="height: 50px; margin-bottom: 10px; border-radius: 50%;">
+                    <h3 id="footerAcademyName">Mayuri Natya Khetram</h3>
+                    <p id="footerDescription">Coimbatore's only affiliated institution with the Tamil Nadu Dr. J. Jayalalithaa Music and Fine Arts University. Nurturing Art, Inspiring Value-Based Lives.</p>
+                    <p id="footerTagline" style="font-style: italic; color: var(--accent);">"கலையின் வழியே இறைவனை உணரலாம்"</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Branches</h4>
+                    <div class="footer-branch-card">
+                        <h5 id="footerBranch1Title">Velandipalayam Branch</h5>
+                        <p id="footerBranch1Address">No. 42, Karpagam Complex, Coimbatore - 641025</p>
+                        <p id="footerBranch1Phone">📞 86755 39678</p>
+                    </div>
+                    <div class="footer-branch-card">
+                        <h5 id="footerBranch2Title">Saravanampatty Branch</h5>
+                        <p id="footerBranch2Address">No. 5/21, KRS Nagar, Coimbatore - 641035</p>
+                        <p id="footerBranch2Phone">📞 99447 23209</p>
+                    </div>
+                </div>
+                <div class="footer-col">
+                    <h4>Quick Links</h4>
+                    <ul style="padding-left: 0;">
+                        <li><a href="#home">Home</a></li>
+                        <li><a href="#about">About</a></li>
+                        <li><a href="#courses">Courses Offered</a></li>
+                        <li><a href="#gallery">Accolades & Gallery</a></li>
+                        <li><a href="#admissions">Admissions Helpline</a></li>
+                        <li><a href="admin.html" style="color: var(--accent); font-weight: 600;">Admin Login</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 Mayuri Natya Khetram. All rights reserved. Affiliate with TNJJMFAU & Bridge Academy.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Floating WhatsApp Enquiry Button -->
+    <a href="https://wa.me/918675539678?text=I%20am%20interested%20in%20admissions%20at%20Mayuri%20Natya%20Khetram" class="whatsapp-float" target="_blank" id="whatsappFloatLink">
+        <svg viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.25 8.477 3.517 2.266 2.268 3.512 5.279 3.51 8.482-.006 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.5-5.739-1.446L0 24zm6.59-4.846c1.6.95 3.188 1.449 4.825 1.451 5.436 0 9.86-4.37 9.864-9.799.002-2.63-1.023-5.101-2.885-6.966a9.81 9.81 0 0 0-6.974-2.879c-5.443 0-9.87 4.373-9.875 9.804-.002 1.77.476 3.5 1.388 5.009L1.93 21.147l4.717-1.993zM18.006 14.73c-.328-.165-1.944-.959-2.245-1.069-.301-.109-.521-.164-.739.164-.219.329-.848 1.069-1.04 1.288-.192.219-.384.246-.712.082-.328-.164-1.386-.51-2.64-1.627-.975-.87-1.633-1.946-1.825-2.274-.192-.329-.02-.507.144-.671.148-.147.329-.384.493-.575.164-.192.219-.329.329-.548.11-.219.055-.411-.027-.575-.082-.164-.739-1.78-.1-2.64-.329-.794-.685-.685-.92-.685-.238-.005-.511-.005-.783-.005-.272 0-.712.102-.1.685.511.52.822 1.134 1.134 1.682.312.548.356 1.04.148 1.488-.208.448-.844.896-1.5 1.328-1.5 1.328-2.625 2.122-3.328 2.625.328.164.63.151.867.116.273-.04.843-.344 1.033-.679.19-.335.19-.623.136-.679-.054-.055-.219-.11-.548-.273z"/></svg>
+        WhatsApp Enquiry
+    </a>
+
+    <!-- Map Modal -->
+    <div class="modal-overlay" id="mapModal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3 id="mapModalTitle">Branch Map</h3>
+                <button class="modal-close-btn" onclick="closeMapModal()">
+                    <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+                </button>
+            </div>
+            <div class="modal-body text-center">
+                <div style="background-color: var(--bg-cream); border: 2px dashed var(--accent); border-radius: var(--radius-sm); padding: 50px 20px; margin-bottom: 20px;">
+                    <div style="font-size: 3rem; margin-bottom: 15px;">📍</div>
+                    <h4 id="mapModalAddress" style="color: var(--primary-dark); font-size: 1.1rem;">Branch Address Details</h4>
+                    <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 10px;">Simulating interactive map loading...</p>
+                </div>
+                <button class="btn btn-primary btn-sm" onclick="closeMapModal()">Close Map</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Image Modal (Lightbox) -->
+    <div class="modal-overlay" id="imageModal">
+        <div class="modal-card" style="max-width: 700px;">
+            <div class="modal-header" style="padding: 15px 20px;">
+                <h3 id="imageModalTitle" style="font-size: 1.1rem;">Gallery View</h3>
+                <button class="modal-close-btn" onclick="closeImageModal()">
+                    <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+                </button>
+            </div>
+            <div class="modal-body text-center" style="padding: 15px;">
+                <img id="imageModalSrc" src="" alt="Zoomed view" style="width: 100%; max-height: 450px; object-fit: contain; border-radius: var(--radius-sm); border: 1px solid var(--border-light);">
+                <p id="imageModalDesc" style="margin-top: 10px; font-weight: 500; font-size: 0.95rem; color: var(--text-dark);"></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Payment Gateway & Checkout Receipt Modal -->
+    <div class="modal-overlay" id="checkoutModal">
+        <div class="modal-card" style="max-width: 550px;">
+            <div class="modal-header">
+                <h3 id="checkoutModalTitle">Secure Payment</h3>
+                <button class="modal-close-btn" onclick="closeCheckoutModal()">
+                    <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- State A: Amount Entry -->
+                <div id="checkoutInputState" style="text-align: center; padding: 10px 0;">
+                    <div style="font-size: 3rem; margin-bottom: 10px;">💳</div>
+                    <h4 style="color: var(--primary-dark); font-size: 1.25rem; margin-bottom: 10px; font-family: 'Cinzel', serif;">Admission Payment Details</h4>
+                    <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 20px; max-width: 400px; margin-left: auto; margin-right: auto;">
+                        Please enter or verify the tuition fee amount manually to complete this registration.
+                    </p>
+                    
+                    <div style="background-color: var(--bg-cream); border: 1px solid var(--border-light); border-radius: 8px; padding: 20px; max-width: 340px; margin: 0 auto 25px; box-sizing: border-box;">
+                        <div class="form-group" style="text-align: left; margin-bottom: 0;">
+                            <label for="checkoutCustomAmount" style="display: block; font-weight: 600; margin-bottom: 8px; color: var(--primary-dark); font-size: 0.9rem;">Payment Amount (₹) *</label>
+                            <input type="number" id="checkoutCustomAmount" required min="1" placeholder="e.g. 1500" style="width: 100%; padding: 12px; border-radius: 6px; border: 1px solid var(--border-light); font-size: 1.25rem; text-align: center; font-weight: 700; color: var(--primary); background-color: white; box-sizing: border-box;">
+                        </div>
+                    </div>
+                    
+                    <button class="btn btn-primary" onclick="processCheckoutPayment()" style="width: 100%; max-width: 340px; padding: 12px; font-size: 1rem; font-weight: 600;">Confirm & Pay Now</button>
+                </div>
+
+                <!-- State B: Spinner Processing -->
+                <div id="checkoutLoadingState" class="spinner-container" style="display: none;">
+                    <div class="spinner"></div>
+                    <h4>Processing Secure Payment...</h4>
+                    <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 10px;">Connecting to payment gateway integration</p>
+                </div>
+
+                <!-- State C: Receipt Display -->
+                <div id="checkoutReceiptState" style="display: none;">
+                    <div class="receipt-layout">
+                        <h2 class="receipt-title">MAYURI NATYA KHETRAM</h2>
+                        <p class="text-center" style="font-size: 0.8rem; margin-bottom: 20px; font-weight: bold;">OFFICIAL ADMISSION RECEIPT</p>
+                        
+                        <div class="receipt-row">
+                            <span>Receipt No:</span>
+                            <span id="recNo" style="font-weight: bold;">MNK/2026/8942</span>
+                        </div>
+                        <div class="receipt-row">
+                            <span>Date & Time:</span>
+                            <span id="recDate">03-Jul-2026 17:05</span>
+                        </div>
+                        <div class="receipt-row">
+                            <span>Roll Number:</span>
+                            <span id="recRoll" style="font-weight: bold;">MNK-26-042</span>
+                        </div>
+                        
+                        <div class="receipt-divider"></div>
+                        
+                        <div class="receipt-row">
+                            <span>Student Name:</span>
+                            <span id="recName">Riya Krishnan</span>
+                        </div>
+                        <div class="receipt-row">
+                            <span>Phone:</span>
+                            <span id="recPhone">9876543210</span>
+                        </div>
+                        <div class="receipt-row">
+                            <span>Program Enrolled:</span>
+                            <span id="recProgram">Diploma</span>
+                        </div>
+                        <div class="receipt-row">
+                            <span>Course Enrolled:</span>
+                            <span id="recCourse">Bharatanatyam</span>
+                        </div>
+                        <div class="receipt-row" id="recLocationRow" style="display: none;">
+                            <span>Branch Location:</span>
+                            <span id="recLocation">Velandipalayam</span>
+                        </div>
+                        <div class="receipt-row">
+                            <span>Level:</span>
+                            <span id="recLevel">Pre-Grade</span>
+                        </div>
+                        <div class="receipt-row">
+                            <span>Selected Batch:</span>
+                            <span id="recClasses">Saturday & Sunday</span>
+                        </div>
+
+                        <div class="receipt-divider"></div>
+
+                        <div class="receipt-row receipt-total">
+                            <span>Amount Paid:</span>
+                            <span id="recAmount">₹1,500.00</span>
+                        </div>
+                        <div class="receipt-row" style="font-size: 0.8rem; color: #28a745; font-weight: bold; margin-top: 10px;">
+                            <span>Payment Status:</span>
+                            <span>SUCCESSFUL (Online Gateway)</span>
+                        </div>
+                        
+                        <p class="text-center" style="font-size: 0.75rem; color: var(--text-muted); margin-top: 25px; line-style: italic;">Thank you for joining our academy family. Your admission records are active in the Student Console.</p>
+                    </div>
+                    <div style="display: flex; gap: 10px; margin-top: 25px; justify-content: flex-end;">
+                        <button class="btn btn-outline btn-sm" onclick="window.print()">Print Receipt</button>
+                        <button class="btn btn-primary btn-sm" onclick="closeCheckoutModal()">Done</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Form Modals -->
+    <!-- 1. Add Enquiry Modal -->
+    <div class="modal-overlay" id="addEnquiryModal">
+        <div class="modal-card" style="max-width: 450px;">
+            <div class="modal-header">
+                <h3>Add Manual Enquiry</h3>
+                <button class="modal-close-btn" onclick="closeAddEnquiryModal()">
+                    <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="addEnquiryForm" onsubmit="handleAddEnquirySubmit(event)">
+                    <div class="form-group">
+                        <label for="enqName">Student Name *</label>
+                        <input type="text" id="enqName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="enqCourse">Course *</label>
+                        <select id="enqCourse" required>
+                            <option value="Bharatanatyam">Bharatanatyam</option>
+                            <option value="Carnatic Vocal">Carnatic Vocal</option>
+                            <option value="Lite Music">Lite Music</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="enqPhone">Phone Number *</label>
+                        <input type="tel" id="enqPhone" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="enqSource">Source *</label>
+                        <select id="enqSource" required>
+                            <option value="Google">Google</option>
+                            <option value="Justdial">Justdial</option>
+                            <option value="Walk-in">Walk-in</option>
+                            <option value="Flyer">Flyer</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">Save Enquiry</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. Add Student Modal -->
+    <div class="modal-overlay" id="addStudentModal">
+        <div class="modal-card" style="max-width: 450px;">
+            <div class="modal-header">
+                <h3>Add New Student Record</h3>
+                <button class="modal-close-btn" onclick="closeAddStudentModal()">
+                    <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="addStudentForm" onsubmit="handleAddStudentSubmit(event)">
+                    <div class="form-group">
+                        <label for="studName">Student Name *</label>
+                        <input type="text" id="studName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="studCourse">Course *</label>
+                        <select id="studCourse" required>
+                            <option value="Bharatanatyam">Bharatanatyam</option>
+                            <option value="Carnatic Vocal">Carnatic Vocal</option>
+                            <option value="Lite Music">Lite Music</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="studLevel">Grade Level *</label>
+                        <select id="studLevel" required>
+                            <option value="pre-grade">Pre-Grade</option>
+                            <option value="grade-1">Grade 1</option>
+                            <option value="grade-2">Grade 2</option>
+                            <option value="grade-3">Grade 3</option>
+                            <option value="grade-4">Grade 4</option>
+                            <option value="grade-5">Grade 5</option>
+                            <option value="grade-6">Grade 6</option>
+                            <option value="grade-7">Grade 7</option>
+                            <option value="grade-8">Grade 8</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="studPhone">Parent Contact Number *</label>
+                        <input type="tel" id="studPhone" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">Add Student</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Login Modal -->
+
+
+    <!-- Script File with cache buster -->
+    <script>
+        const script = document.createElement('script');
+        script.src = 'app.js?v=' + Date.now();
+        document.body.appendChild(script);
+    </script>
+</body>
+</html>
